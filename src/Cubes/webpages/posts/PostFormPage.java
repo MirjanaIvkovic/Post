@@ -1,11 +1,19 @@
 package Cubes.webpages.posts;
 
+import java.io.File;
+import java.time.Duration;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class PostFormPage {
@@ -21,24 +29,31 @@ public class PostFormPage {
 	private WebElement weInputTitle;
 	@FindBy(name="description")
 	private WebElement weInputDescription;
-	@FindBy(xpath="//label[@class='custom-control-label']")
-	private WebElement weImportant;
-	@FindBy(name="tag_id[]")
-	private WebElement weTags;
-	@FindBy(name="photo")
-	private WebElement weChooseNewPhoto;
-	@FindBy(xpath="//html[@dir='ltr']")
-	private WebElement weContent;
+	@FindBy(id="set-as-important")
+	private WebElement weRadioButtonImportant;
+	@FindBy(id="tag-checkbox-8")
+	private WebElement weCheckBoxTags;
+	@FindBy(xpath="//input[@type='file']")
+	private WebElement weButtonChooseNewPhoto;
+	@FindBy(xpath="//body[@class='cke_editable cke_editable_themed cke_contents_ltr cke_show_borders']//child::p[1]")
+	private WebElement weAreaContent;
 	@FindBy(xpath="//button[@type='submit']")
 	private WebElement weButtonSave;
-	@FindBy(xpath="//a[@href='https://testblog.kurs-qa.cubes.edu.rs/admin/posts']")
+	@FindBy(xpath="//a[@href='https://testblog.kurs-qa.cubes.edu.rs/admin/posts']/p")
 	private WebElement weButtonCancel;
-	@FindBy()
+	@FindBy(id="title-error")
 	private WebElement weErrorTitle;
-	@FindBy()
-	private WebElement weErrorDescription;
-	@FindBy()
-	private WebElement weErrorCategory;
+	@FindBy(id="description-error")
+	private WebElement weErrorDescription;	
+	@FindBy(id="tag_id[]-error")
+	private WebElement weErrorTags;
+	@FindBy(xpath="//div[@class='invalid-feedback']")
+	private WebElement weErrorPhotos;
+	@FindBy(xpath="//class['invalid-feedback']")
+	private WebElement weErrorContent;
+	@FindBy(xpath="//ul[@class='navbar-nav']")
+	private WebElement weHamburger;
+
 	
 	public PostFormPage(WebDriver driver, WebDriverWait driverWait) {
 		this.driver = driver;
@@ -65,10 +80,31 @@ public class PostFormPage {
 	
 	public void openPage() {
 		this.driver.get(PAGE_URL);
+		this.weHamburger.click();
 	}
 	
 	public void clickOnSave() {
-		weButtonSave.click();
+//		Actions actions = new Actions(driver);
+//		actions.sendKeys(Keys.END).perform();
+//		actions.keyDown(Keys.CONTROL).sendKeys(Keys.SUBTRACT).sendKeys(Keys.SUBTRACT).sendKeys(Keys.SUBTRACT).sendKeys(Keys.SUBTRACT).sendKeys(Keys.SUBTRACT).keyUp(Keys.CONTROL).perform();
+		
+//		JavascriptExecutor js = (JavascriptExecutor) driver;
+//		js.executeScript("document.body.style.zoom='80%'");
+//		js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+		
+//		WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(2000));
+//		weButtonSave = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@type='submit']")));
+		
+//		actions.moveToElement(weButtonSave).perform();
+//		try {
+//			driverWait.wait(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		weHamburger.click();
+//		weButtonSave.click();
 	}
 	
 	public void clickOnCancel() {
@@ -76,7 +112,6 @@ public class PostFormPage {
 	}
 	
 	public void dropdownCategory(String category) {
-		weDropdownCategory.clear();
 		weDropdownCategory.sendKeys(category);
 	}
 
@@ -90,25 +125,56 @@ public class PostFormPage {
 		weInputDescription.sendKeys(descritpion);
 	}
 	
-	public void buttonImportant(String important) {
-		weImportant.clear();
-		weImportant.sendKeys(important);
+	public void clickOnRadioButtonImportant() {
+		weRadioButtonImportant.click();
 	}
 	
-	public void buttonTags(String tags) {
-		weTags.clear();
-		weTags.sendKeys(tags);
+	public void unselectOnCheckBoxTags() {
+		if (weCheckBoxTags.isSelected()) {
+			weCheckBoxTags.click();
+		}
 	}
 	
-	public void weChooseNewPhoto(String photo) {
-		weChooseNewPhoto.clear();
-		weChooseNewPhoto.sendKeys(photo);
+	public void selectOnCheckBoxTags() {
+		if (!weCheckBoxTags.isSelected()) {
+			weCheckBoxTags.click();
+		}
 	}
 	
-	public void weContent(String content) {
-		weContent.clear();
-		weContent.sendKeys(content);
+	
+	public void uploadImage() {
+		File file = new File("./Screenshot_1.png");
+		weButtonChooseNewPhoto.sendKeys(file.getAbsolutePath());
+	}
+	
+	public void uploadNotImage() {
+		File file = new File("./pom.xml");
+		weButtonChooseNewPhoto.sendKeys(file.getAbsolutePath());
+	}
+	
+	public void inputStringInContent(String content) {
+		driver.switchTo().frame(driver.findElement(By.xpath("//iframe[1]")));
+		driver.findElement(By.cssSelector("body")).sendKeys("valid content");
+	}
 		
+	public String getTitleInputError() {
+		return weErrorTitle.getText();
+	}
+	
+	public String getDescriptionInputError() {
+		return weErrorDescription.getText();
+	}
+	
+	public String getTagsInputError() {
+		return weErrorTags.getText();
+	}
+	
+	public String getErrorChooseNewPhoto() {
+		return weErrorPhotos.getText();
+	}
+	
+	public String getContentInputError() {
+		return weErrorContent.getText();
 	}
 }
 

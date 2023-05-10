@@ -60,7 +60,7 @@ public class TestLoginPage {
 		
 		loginPage.clickOnSignIn();
 		
-		assertEquals(driver.getCurrentUrl(), "http://testblog.kurs-qa.cubes.edu.rs/admin");
+		assertEquals(driver.getCurrentUrl(), "https://testblog.kurs-qa.cubes.edu.rs/admin");
 	}
 
 }
